@@ -183,10 +183,14 @@ int main(void) {
 
     // Projection matrix
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(30.0f), (float)height/(float)width, 0.1f, 1000.0f);
+    projection = glm::perspective(glm::radians(30.0f), (float)width/(float)height, 0.1f, 1000.0f);
+
+    // Get uniform locations
+    int modelLoc = glGetUniformLocation(shaderProgram, "model");
+    int camLoc = glGetUniformLocation(shaderProgram, "view");
     int projLoc = glGetUniformLocation(shaderProgram, "projection");
 
-    // Render loop, keeps running until told to stop
+    // Rendering loop, keeps running until told to stop
     while (!glfwWindowShouldClose(window)) {
         // Input
         processInput(window);
@@ -205,7 +209,6 @@ int main(void) {
         // Model matrix
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        int modelLoc = glGetUniformLocation(shaderProgram, "model");
 
         // View matrix
         glm::vec3 camPos = glm::vec3(-6.0f, -7.0f, -8.0f);
@@ -213,9 +216,8 @@ int main(void) {
         glm::mat4 view;
         // Last param = up vector in world space
         view = glm::lookAt(camPos, camTarget, glm::vec3(0.0f, 1.0f, 0.0f));
-        int camLoc = glGetUniformLocation(shaderProgram, "view");
 
-        // Pass transformation matrices to shader
+        // Pass the transformation matrices to the shader
         glUseProgram(shaderProgram);
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(camLoc, 1, GL_FALSE, glm::value_ptr(view));
