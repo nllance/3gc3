@@ -183,7 +183,7 @@ int main(void) {
 
     // Projection matrix
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(30.0f), (float)width/(float)height, 0.1f, 1000.0f);
+    projection = glm::perspective(glm::radians(30.0f), (float) width/height, 0.1f, 1000.0f);
 
     // Get uniform locations
     int modelLoc = glGetUniformLocation(shaderProgram, "model");
@@ -221,7 +221,6 @@ int main(void) {
         glBindVertexArray(VAO);
 
         // The sun - model matrix
-        // Model matrix
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));

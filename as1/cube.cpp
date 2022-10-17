@@ -183,7 +183,7 @@ int main(void) {
 
     // Projection matrix
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(30.0f), (float)width/(float)height, 0.1f, 1000.0f);
+    projection = glm::perspective(glm::radians(30.0f), (float) width/height, 0.1f, 1000.0f);
 
     // Get uniform locations
     int modelLoc = glGetUniformLocation(shaderProgram, "model");
