@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 static unsigned int ss_id = 0;
 
@@ -57,7 +58,7 @@ int main(void) {
     int height = 768;
 
     // Create a window object
-    GLFWwindow* window = glfwCreateWindow(width, height, "static_system", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, "dynamic_system", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -212,9 +213,15 @@ int main(void) {
         // Clear the colour buffer and depth buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Relevant positions
+        float xEarthToSun = 20 * cos(glm::radians(get_earth_rotate_angle_around_sun(365)));
+        float zEarthToSun = -20 * sin(glm::radians(get_earth_rotate_angle_around_sun(365)));
+        float xMoonToEarth = 10 * cos(glm::radians(get_moon_rotate_angle_around_earth(365)));
+        float zMoonToEarth = -10 * sin(glm::radians(get_moon_rotate_angle_around_earth(365)));
+
         // View matrix
-        glm::vec3 camPos = glm::vec3(50.0f, 60.0f, 70.0f);
-        glm::vec3 camTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 camPos = glm::vec3(-30.0f, -40.0f, -50.0f);
+        glm::vec3 camTarget = glm::vec3(xEarthToSun, 0.0f, zEarthToSun);
         glm::mat4 view;
         // Last param = up vector in world space
         view = glm::lookAt(camPos, camTarget, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -230,7 +237,7 @@ int main(void) {
         glm::mat4 sunModel = glm::mat4(1.0f);
         sunModel = glm::translate(sunModel, glm::vec3(0.0f, 0.0f, 0.0f));
         // The sun revolves
-        sunModel = glm::rotate(sunModel, glm::radians(get_sun_rotate_angle_around_itself(128)), glm::vec3(0.0f, 1.0f, 0.0f));
+        sunModel = glm::rotate(sunModel, glm::radians(get_sun_rotate_angle_around_itself(365)), glm::vec3(0.0f, 1.0f, 0.0f));
         sunModel = glm::scale(sunModel, glm::vec3(4.0f, 4.0f, 4.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(sunModel));
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -238,12 +245,10 @@ int main(void) {
         // The earth - model matrix
         glm::mat4 earthModel = glm::mat4(1.0f);
         // The earth orbits
-        earthModel = glm::rotate(earthModel, glm::radians(get_earth_rotate_angle_around_sun(128)), glm::vec3(0.0f, 1.0f, 0.0f));
-        earthModel = glm::translate(earthModel, glm::vec3(20.0f, 0.0f, 0.0f));
+        earthModel = glm::translate(earthModel, glm::vec3(xEarthToSun, 0.0f, zEarthToSun));
         // The earth revolves
-        
-        earthModel = glm::rotate(earthModel, glm::radians(get_earth_rotate_angle_around_itself(128)), glm::vec3(0.0f, 1.0f, 0.0f));
         earthModel = glm::rotate(earthModel, glm::radians(-23.4f), glm::vec3(0.0f, 0.0f, 1.0f));
+        earthModel = glm::rotate(earthModel, glm::radians(get_earth_rotate_angle_around_itself(365)), glm::vec3(0.0f, 1.0f, 0.0f));
         earthModel = glm::scale(earthModel, glm::vec3(2.5f, 2.5f, 2.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(earthModel));
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -251,12 +256,10 @@ int main(void) {
         // The moon - model matrix
         glm::mat4 moonModel = glm::mat4(1.0f);
         // The moon orbits
-        moonModel = glm::rotate(moonModel, glm::radians(get_earth_rotate_angle_around_sun(128)), glm::vec3(0.0f, 1.0f, 0.0f));
-        moonModel = glm::translate(moonModel, glm::vec3(20.0f, 0.0f, 0.0f));
-        moonModel = glm::rotate(moonModel, glm::radians(get_moon_rotate_angle_around_earth(128)), glm::vec3(0.0f, 1.0f, 0.0f));
-        moonModel = glm::translate(moonModel, glm::vec3(10.0f, 0.0f, 0.0f));
+        moonModel = glm::translate(moonModel, glm::vec3(xEarthToSun, 0.0f, zEarthToSun));
+        moonModel = glm::translate(moonModel, glm::vec3(xMoonToEarth, 0.0f, zMoonToEarth)); 
         // The moon revolves
-        moonModel = glm::rotate(moonModel, glm::radians(get_moon_rotate_angle_around_itself(128)), glm::vec3(0.0f, 1.0f, 0.0f));
+        moonModel = glm::rotate(moonModel, glm::radians(get_moon_rotate_angle_around_itself(365)), glm::vec3(0.0f, 1.0f, 0.0f));
         moonModel = glm::scale(moonModel, glm::vec3(1.5f, 1.5f, 1.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(moonModel));
         glDrawArrays(GL_TRIANGLES, 0, 36);
