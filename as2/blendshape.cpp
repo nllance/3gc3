@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <cmath>
 
 #include <model.h>
 
@@ -16,7 +15,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void dump_framebuffer_to_ppm(std::string prefix, unsigned int width, unsigned int height);
 
-std::vector<float> get_weights(const char *path, int num);
+std::vector<float> get_weights(const char *path);
 
 
 int main(void) {
@@ -63,8 +62,56 @@ int main(void) {
 
     // Load models
     std::vector<std::string> paths;
-    paths.push_back("../data/faces/20.obj");
+    paths.push_back("../data/faces/base.obj");
+    for (int i = 0; i < 35; i++) {
+        std::string path = "../data/faces/" + std::to_string(i) + ".obj";
+        paths.push_back(path);
+    }
     Model src_model(paths);
+
+    // Load weights
+    std::vector<float> weights = get_weights("../data/weights/0.weights");
+
+    // Blendshape
+    std::vector<Vertex> new_vertices;
+    std::vector<uint32_t> new_indices;
+    // The way faces are constructed by vertices is the same across all shapes
+    // So we can just use the indices of the base
+    new_indices = src_model.meshes[0].indices;
+    // Vertices of the base
+    std::vector<Vertex> base_vertices = src_model.meshes[0].vertices;
+
+    // Iterate through each vertex of the base
+    unsigned int i, j;
+    for (i = 0; i < base_vertices.size(); i++) {
+        Vertex new_vertex;
+        glm::vec3 base_position = base_vertices[i].Position;
+        // Initialize the new position to that of the base
+        glm::vec3 new_position = base_position;
+        // Use the normals of the base
+        new_vertex.Normal = base_vertices[i].Normal;
+
+        // Iterate through each mesh to get the corresponding vertex
+        for (j = 1; j < src_model.meshes.size(); j++) {
+            // Vertices of the jth mesh
+            std::vector<Vertex> add_vertices = src_model.meshes[j].vertices;
+            // std::cout << j << std::endl;
+            // std::cout << base_vertices.size() << std::endl;
+            // std::cout << add_vertices.size() << std::endl;
+            // assert(base_vertices.size() == add_vertices.size());
+            // Blending computation
+            new_position.x += weights[j-1] * (add_vertices[i].Position.x - base_position.x);
+            new_position.y += weights[j-1] * (add_vertices[i].Position.y - base_position.y);
+            new_position.z += weights[j-1] * (add_vertices[i].Position.z - base_position.z);
+        }
+
+        // Set new position for the vertex
+        new_vertex.Position = new_position;
+        new_vertices.push_back(new_vertex);
+    }
+
+    // New Mesh to draw
+    Mesh new_mesh = Mesh(new_vertices, new_indices);
 
     // Transformation matrices
     glm::mat4 model = glm::mat4(1.0f);
@@ -88,7 +135,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw the mesh
-        src_model.meshes[0].Draw(shader);
+        new_mesh.Draw(shader);
 
         // Swap the colour buffer during this render iteration and show to the screen
         glfwSwapBuffers(window);
@@ -102,8 +149,8 @@ int main(void) {
 }
 
 
-// Function to read weights from a file, takes the path to the file and the number of weights
-std::vector<float> get_weights(const char *path, int num) {
+// Function to read weights from a file, takes the path to the file
+std::vector<float> get_weights(const char *path) {
     std::vector<float> weights;
     // Read from file
     std::ifstream infile(path);
@@ -142,7 +189,7 @@ void dump_framebuffer_to_ppm(std::string prefix, unsigned int width, unsigned in
     int totalPixelSize = pixelChannel * width * height * sizeof(GLubyte);
     GLubyte * pixels = new GLubyte [totalPixelSize];
     glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-    std::string file = "../images/20.ppm";
+    std::string file = "../images/blended0.ppm";
     std::ofstream fout(file);
     fout << "P3\n" << width << " " << height << "\n" << 255 << std::endl;
     for (size_t i = 0; i < height; i++)

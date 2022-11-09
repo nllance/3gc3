@@ -62,7 +62,7 @@ int main(void) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Load models
-    std::vector<const char*> paths;
+    std::vector<std::string> paths;
     paths.push_back("../data/cube.obj");
     Model src_model(paths);
 

@@ -15,21 +15,16 @@
 #include <map>
 
 
-// Function to compare two glm::vec3
-bool less_than_vec3(const glm::vec3& lhs, const glm::vec3& rhs) {
-    return lhs.x < rhs.x ||
-           (lhs.x == rhs.x && lhs.y < rhs.y) || 
-           (lhs.x == rhs.x && (lhs.y == rhs.y && lhs.z < rhs.z));
-}
 // Define "<" for glm::vec3
 struct KeyFunc {
-    bool operator() (const Vertex& lhs, const Vertex& rhs) const {
-        return less_than_vec3(lhs.Position, rhs.Position) ||
-           (lhs.Position == rhs.Position && less_than_vec3(lhs.Normal, rhs.Normal));
+    bool operator() (const glm::vec3& lhs, const glm::vec3& rhs) const {
+        return lhs.x < rhs.x ||
+           (lhs.x == rhs.x && lhs.y < rhs.y) || 
+           (lhs.x == rhs.x && (lhs.y == rhs.y && lhs.z < rhs.z));
     }
 };
 // Map type to keep track of unique vertices and respective indices
-typedef std::map<Vertex, uint32_t, KeyFunc> MyMap;
+typedef std::map<glm::vec3, uint32_t, KeyFunc> MyMap;
 
 
 class Model {
@@ -37,9 +32,9 @@ class Model {
         std::vector<Mesh> meshes;
 
         // Constructor, expects a vector of paths to obj files
-        Model(std::vector<const char*> paths) {
+        Model(std::vector<std::string> paths) {
             for (int i = 0; i < paths.size(); i++)
-                loadMesh(paths[i]);
+                loadMesh(paths[i].c_str());
         }
 
         // Draw the model
@@ -51,7 +46,7 @@ class Model {
     private:
         // Load a mesh with tinyobjloader, and store the results in the meshes vector
         void loadMesh(const char *path) {
-            // To initialize using tinyobloader
+            // To initialize using tinyobjloader
             tinyobj::attrib_t attrib;
             std::vector<tinyobj::shape_t> shapes;
             std::vector<tinyobj::material_t> materials;
@@ -76,6 +71,8 @@ class Model {
             // If a vertex already exists, we do not add it to the list of vertices again
             MyMap uniqueVertices;
 
+            int size = 0;
+
              // For each face
             for (auto face : shapes[0].mesh.indices) {
                 Vertex vertex;
@@ -85,23 +82,23 @@ class Model {
                 position.x = attrib.vertices[face.vertex_index * 3];
                 position.y = attrib.vertices[face.vertex_index * 3 + 1];
                 position.z = attrib.vertices[face.vertex_index * 3 + 2];
-                // Get vertex normals
-                normal.x = attrib.normals[face.normal_index * 3];
-                normal.y = attrib.normals[face.normal_index * 3 + 1];
-                normal.z = attrib.normals[face.normal_index * 3 + 2];
-                // Set vertex
-                vertex.Position = position;
-                vertex.Normal = normal; 
 
                 // Add the vertex to the vertices list if not already present
-                if (uniqueVertices.count(vertex) == 0) {
+                if (uniqueVertices.count(position) == 0) {
+                    // Get vertex normals
+                    normal.x = attrib.normals[face.normal_index * 3];
+                    normal.y = attrib.normals[face.normal_index * 3 + 1];
+                    normal.z = attrib.normals[face.normal_index * 3 + 2];
+                    // Set vertex
+                    vertex.Position = position;
+                    vertex.Normal = normal;
                     // Set the index of the new vertex
-                    uniqueVertices[vertex] = static_cast<uint32_t> (vertices.size());
+                    uniqueVertices[position] = static_cast<uint32_t> (vertices.size());
                     vertices.push_back(vertex);
                 }
 
                 // Add the index to the indices list
-                indices.push_back(uniqueVertices[vertex]);
+                indices.push_back(uniqueVertices[position]);
             }
             
             return Mesh(vertices, indices);

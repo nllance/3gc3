@@ -22,8 +22,6 @@ class Mesh {
         // Mesh data
         std::vector<Vertex>   vertices;
         std::vector<uint32_t> indices;
-        // Vertex array object
-        unsigned int VAO;
 
         // Constructor
         Mesh (std::vector<Vertex> vertices, std::vector<uint32_t> indices) {
@@ -42,8 +40,8 @@ class Mesh {
         }
 
     private:
-        // Vertex buffer object and element buffer object
-        unsigned int VBO, EBO;
+        // // Vertex array object, Vertex buffer object and element buffer object
+        unsigned int VAO, VBO, EBO;
 
         // Initialize all the buffer objects/arrays
         void setupMesh() {
