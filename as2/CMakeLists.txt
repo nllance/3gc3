@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(rotate_system)
+project(cube)
 
 set(OpenGL_GL_PREFERENCE GLVND)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
-add_executable(rotate_system rotate_system.cpp ../glad.c)
+set(SOURCES cube.cpp shader.h mesh.h model.h tiny_obj_loader.h ../glad.c)
+add_executable(cube ${SOURCES})
 
-target_link_libraries(rotate_system glfw OpenGL::GL)
+target_link_libraries(cube glfw OpenGL::GL)
