@@ -14,41 +14,37 @@
 #include <vector>
 #include <map>
 
+
+// Function to compare two glm::vec3
+bool less_than_vec3(const glm::vec3& lhs, const glm::vec3& rhs) {
+    return lhs.x < rhs.x ||
+           (lhs.x == rhs.x && lhs.y < rhs.y) || 
+           (lhs.x == rhs.x && (lhs.y == rhs.y && lhs.z < rhs.z));
+}
 // Define "<" for glm::vec3
-struct KeyFuncs {
-    bool operator() (const glm::vec3& lhs, const glm::vec3& rhs) const {
-        return lhs.x < rhs.x ||
-           (lhs.x == rhs.x) && (lhs.y < rhs.y) || 
-           (lhs.y == rhs.y) && (lhs.z < rhs.z);
+struct KeyFunc {
+    bool operator() (const Vertex& lhs, const Vertex& rhs) const {
+        return less_than_vec3(lhs.Position, rhs.Position) ||
+           (lhs.Position == rhs.Position && less_than_vec3(lhs.Normal, rhs.Normal));
     }
 };
 // Map type to keep track of unique vertices and respective indices
-typedef std::map<glm::vec3, uint32_t, KeyFuncs> MyMap;
+typedef std::map<Vertex, uint32_t, KeyFunc> MyMap;
 
 
 class Model {
     public:
         std::vector<Mesh> meshes;
 
-        // Constructor, expects a filepath to a model and the number of obj files to load
-        Model(std::string path, int num_of_meshes) {
-            // When only given 1 mesh, the input path should be the full path to an .obj file
-            if (num_of_meshes == 1) {
-                loadMesh(path.c_str());
-            }
-            // When multiple meshes, calculate the full path to each
-            else {
-                for (int i = 0; i < num_of_meshes; i++) {
-                    std::string obj_path = path + std::to_string(i) + ".obj";
-                    const char *char_obj_path = obj_path.c_str();
-                    loadMesh(char_obj_path);
-                }
-            }
+        // Constructor, expects a vector of paths to obj files
+        Model(std::vector<const char*> paths) {
+            for (int i = 0; i < paths.size(); i++)
+                loadMesh(paths[i]);
         }
 
         // Draw the model
         void Draw(Shader &shader) {
-            for (unsigned int i = 0; i < meshes.size(); i++)
+            for (int i = 0; i < meshes.size(); i++)
                 meshes[i].Draw(shader);
         }
     
@@ -80,36 +76,34 @@ class Model {
             // If a vertex already exists, we do not add it to the list of vertices again
             MyMap uniqueVertices;
 
-            // For each shape
-            for (auto shape : shapes) {
-                // For each face
-                for (auto face : shape.mesh.indices) {
-                    Vertex vertex;
-                    glm::vec3 position, normal;
+             // For each face
+            for (auto face : shapes[0].mesh.indices) {
+                Vertex vertex;
+                glm::vec3 position, normal;
 
-                    // Get vertex position
-                    position.x = attrib.vertices[face.vertex_index * 3];
-                    position.y = attrib.vertices[face.vertex_index * 3 + 1];
-                    position.z = attrib.vertices[face.vertex_index * 3 + 2];
+                // Get vertex position
+                position.x = attrib.vertices[face.vertex_index * 3];
+                position.y = attrib.vertices[face.vertex_index * 3 + 1];
+                position.z = attrib.vertices[face.vertex_index * 3 + 2];
+                // Get vertex normals
+                normal.x = attrib.normals[face.normal_index * 3];
+                normal.y = attrib.normals[face.normal_index * 3 + 1];
+                normal.z = attrib.normals[face.normal_index * 3 + 2];
+                // Set vertex
+                vertex.Position = position;
+                vertex.Normal = normal; 
 
-                    // Add the vertex to the vertices list if not already present
-                    if (uniqueVertices.count(position) == 0) {
-                        // Set the index of the new vertex
-                        uniqueVertices[position] = static_cast<uint32_t> (vertices.size());
-                        // Get vertex normals
-                        normal.x = attrib.normals[face.normal_index * 3];
-                        normal.y = attrib.normals[face.normal_index * 3 + 1];
-                        normal.z = attrib.normals[face.normal_index * 3 + 2];
-                        // Set vertex
-                        vertex.Position = position;
-                        vertex.Normal = normal; 
-                        vertices.push_back(vertex);
-                    }
-
-                    // Add the index to the indices list
-                    indices.push_back(uniqueVertices[position]);
+                // Add the vertex to the vertices list if not already present
+                if (uniqueVertices.count(vertex) == 0) {
+                    // Set the index of the new vertex
+                    uniqueVertices[vertex] = static_cast<uint32_t> (vertices.size());
+                    vertices.push_back(vertex);
                 }
+
+                // Add the index to the indices list
+                indices.push_back(uniqueVertices[vertex]);
             }
+            
             return Mesh(vertices, indices);
         }
 };
