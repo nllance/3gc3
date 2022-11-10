@@ -58,7 +58,7 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     // Wireframe mode
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Load models
     std::vector<std::string> paths;
@@ -70,7 +70,7 @@ int main(void) {
     Model src_model(paths);
 
     // Load weights
-    std::vector<float> weights = get_weights("../data/weights/3.weights");
+    std::vector<float> weights = get_weights("../data/weights/5.weights");
 
     // Blendshape
     std::vector<Vertex> new_vertices;
@@ -93,10 +93,11 @@ int main(void) {
 
         // Iterate through each mesh to get the corresponding vertex
         for (j = 1; j < src_model.meshes.size(); j++) {
-            // 7.obj and 8.obj each has 1 less vertex than other meshes...
-            // if ((j == 8 || j == 9) && i == base_vertices.size() - 1) continue;
             // Vertices of the jth mesh
             std::vector<Vertex> add_vertices = src_model.meshes[j].vertices;
+            // 7.obj and 8.obj each has 1 less vertex than other meshes...
+            if (i >= add_vertices.size()) continue;
+            
             // Blending computation
             new_position.x += weights[j-1] * (add_vertices[i].Position.x - base_position.x);
             new_position.y += weights[j-1] * (add_vertices[i].Position.y - base_position.y);

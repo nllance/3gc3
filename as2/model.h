@@ -111,7 +111,7 @@ class Model {
                 indices.push_back(uniqueVertices[vertex]);
             }
             
-            std::cout << vertices.size() << std::endl;
+            // std::cout << vertices.size() << std::endl;
             return Mesh(vertices, indices);
         }
 };

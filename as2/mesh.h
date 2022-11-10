@@ -26,8 +26,8 @@ struct Vertex {
 // Hash function for vertices, to be used with unordered_map
 namespace std {
     template<> struct hash<Vertex> {
-        size_t operator()(Vertex const& vertex) const {
-            return ((hash<glm::vec3>() (vertex.Position)) >> 1);
+        size_t operator()(Vertex const& vertex) const noexcept {
+            return hash<glm::vec3>()(vertex.Position);
         }
     };
 }
