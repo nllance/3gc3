@@ -32,7 +32,7 @@ int main(void) {
     int height = 768;
 
     // Create a window object
-    GLFWwindow* window = glfwCreateWindow(width, height, "cube", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, "faces", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();

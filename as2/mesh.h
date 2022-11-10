@@ -3,18 +3,34 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/hash.hpp>
 
 #include <shader.h>
 
 #include <vector>
 
 
+// Struct for vertices
 struct Vertex {
     // Position
     glm::vec3 Position;
     // Normal
     glm::vec3 Normal;
+
+    // Overload the equality operator
+    bool operator==(const Vertex& other) const {
+        return Position == other.Position;
+    }
 };
+
+// Hash function for vertices, to be used with unordered_map
+namespace std {
+    template<> struct hash<Vertex> {
+        size_t operator()(Vertex const& vertex) const {
+            return ((hash<glm::vec3>() (vertex.Position)) >> 1);
+        }
+    };
+}
 
 
 class Mesh {

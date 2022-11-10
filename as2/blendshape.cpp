@@ -31,7 +31,7 @@ int main(void) {
     int height = 768;
 
     // Create a window object
-    GLFWwindow* window = glfwCreateWindow(width, height, "cube", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, "blendshape", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -70,7 +70,7 @@ int main(void) {
     Model src_model(paths);
 
     // Load weights
-    std::vector<float> weights = get_weights("../data/weights/0.weights");
+    std::vector<float> weights = get_weights("../data/weights/3.weights");
 
     // Blendshape
     std::vector<Vertex> new_vertices;
@@ -93,12 +93,10 @@ int main(void) {
 
         // Iterate through each mesh to get the corresponding vertex
         for (j = 1; j < src_model.meshes.size(); j++) {
+            // 7.obj and 8.obj each has 1 less vertex than other meshes...
+            // if ((j == 8 || j == 9) && i == base_vertices.size() - 1) continue;
             // Vertices of the jth mesh
             std::vector<Vertex> add_vertices = src_model.meshes[j].vertices;
-            // std::cout << j << std::endl;
-            // std::cout << base_vertices.size() << std::endl;
-            // std::cout << add_vertices.size() << std::endl;
-            // assert(base_vertices.size() == add_vertices.size());
             // Blending computation
             new_position.x += weights[j-1] * (add_vertices[i].Position.x - base_position.x);
             new_position.y += weights[j-1] * (add_vertices[i].Position.y - base_position.y);
@@ -189,7 +187,7 @@ void dump_framebuffer_to_ppm(std::string prefix, unsigned int width, unsigned in
     int totalPixelSize = pixelChannel * width * height * sizeof(GLubyte);
     GLubyte * pixels = new GLubyte [totalPixelSize];
     glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-    std::string file = "../images/blended0.ppm";
+    std::string file = "../images/blended2.ppm";
     std::ofstream fout(file);
     fout << "P3\n" << width << " " << height << "\n" << 255 << std::endl;
     for (size_t i = 0; i < height; i++)

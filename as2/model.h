@@ -12,19 +12,31 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
-
-// Define "<" for glm::vec3
+/*
+// Functions to compare two vectors
+bool less_than_vec3(const glm::vec3& lhs, const glm::vec3& rhs) {
+    return lhs.x < rhs.x ||
+        (lhs.x == rhs.x && lhs.y < rhs.y) || 
+        ((lhs.x == rhs.x && lhs.y == rhs.y) && lhs.z < rhs.z);
+}
+bool less_than_vec2(const glm::vec2& lhs, const glm::vec2& rhs) {
+    return lhs.x < rhs.x ||
+        (lhs.x == rhs.x && lhs.y < rhs.y);
+}
+// Define "<" for Vertex
 struct KeyFunc {
-    bool operator() (const glm::vec3& lhs, const glm::vec3& rhs) const {
-        return lhs.x < rhs.x ||
-           (lhs.x == rhs.x && lhs.y < rhs.y) || 
-           (lhs.x == rhs.x && (lhs.y == rhs.y && lhs.z < rhs.z));
+    bool operator() (const Vertex& lhs, const Vertex& rhs) const {
+        return less_than_vec3(lhs.Position, rhs.Position) ||
+           (lhs.Position == rhs.Position && less_than_vec3(lhs.Normal, rhs.Normal)) ||
+           ((lhs.Position == rhs.Position && lhs.Normal == rhs.Normal) && less_than_vec2(lhs.Texture, rhs.Texture));
     }
 };
+
 // Map type to keep track of unique vertices and respective indices
-typedef std::map<glm::vec3, uint32_t, KeyFunc> MyMap;
+typedef std::map<Vertex, uint32_t, KeyFunc> MyMap;
+*/
 
 
 class Model {
@@ -69,9 +81,7 @@ class Model {
             std::vector<uint32_t> indices;
             // Keep track of unique vertices and respective indices
             // If a vertex already exists, we do not add it to the list of vertices again
-            MyMap uniqueVertices;
-
-            int size = 0;
+            std::unordered_map<Vertex, uint32_t> uniqueVertices;
 
              // For each face
             for (auto face : shapes[0].mesh.indices) {
@@ -82,25 +92,26 @@ class Model {
                 position.x = attrib.vertices[face.vertex_index * 3];
                 position.y = attrib.vertices[face.vertex_index * 3 + 1];
                 position.z = attrib.vertices[face.vertex_index * 3 + 2];
+                // Get vertex normals
+                normal.x = attrib.normals[face.normal_index * 3];
+                normal.y = attrib.normals[face.normal_index * 3 + 1];
+                normal.z = attrib.normals[face.normal_index * 3 + 2];
+                // Set vertex
+                vertex.Position = position;
+                vertex.Normal = normal;
 
                 // Add the vertex to the vertices list if not already present
-                if (uniqueVertices.count(position) == 0) {
-                    // Get vertex normals
-                    normal.x = attrib.normals[face.normal_index * 3];
-                    normal.y = attrib.normals[face.normal_index * 3 + 1];
-                    normal.z = attrib.normals[face.normal_index * 3 + 2];
-                    // Set vertex
-                    vertex.Position = position;
-                    vertex.Normal = normal;
+                if (uniqueVertices.count(vertex) == 0) {
                     // Set the index of the new vertex
-                    uniqueVertices[position] = static_cast<uint32_t> (vertices.size());
+                    uniqueVertices[vertex] = static_cast<uint32_t> (vertices.size());
                     vertices.push_back(vertex);
                 }
 
                 // Add the index to the indices list
-                indices.push_back(uniqueVertices[position]);
+                indices.push_back(uniqueVertices[vertex]);
             }
             
+            std::cout << vertices.size() << std::endl;
             return Mesh(vertices, indices);
         }
 };
