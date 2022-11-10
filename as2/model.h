@@ -14,30 +14,6 @@
 #include <vector>
 #include <unordered_map>
 
-/*
-// Functions to compare two vectors
-bool less_than_vec3(const glm::vec3& lhs, const glm::vec3& rhs) {
-    return lhs.x < rhs.x ||
-        (lhs.x == rhs.x && lhs.y < rhs.y) || 
-        ((lhs.x == rhs.x && lhs.y == rhs.y) && lhs.z < rhs.z);
-}
-bool less_than_vec2(const glm::vec2& lhs, const glm::vec2& rhs) {
-    return lhs.x < rhs.x ||
-        (lhs.x == rhs.x && lhs.y < rhs.y);
-}
-// Define "<" for Vertex
-struct KeyFunc {
-    bool operator() (const Vertex& lhs, const Vertex& rhs) const {
-        return less_than_vec3(lhs.Position, rhs.Position) ||
-           (lhs.Position == rhs.Position && less_than_vec3(lhs.Normal, rhs.Normal)) ||
-           ((lhs.Position == rhs.Position && lhs.Normal == rhs.Normal) && less_than_vec2(lhs.Texture, rhs.Texture));
-    }
-};
-
-// Map type to keep track of unique vertices and respective indices
-typedef std::map<Vertex, uint32_t, KeyFunc> MyMap;
-*/
-
 
 class Model {
     public:
@@ -50,9 +26,9 @@ class Model {
         }
 
         // Draw the model
-        void Draw(Shader &shader) {
+        void Draw() {
             for (int i = 0; i < meshes.size(); i++)
-                meshes[i].Draw(shader);
+                meshes[i].Draw();
         }
     
     private:
@@ -84,34 +60,37 @@ class Model {
             std::unordered_map<Vertex, uint32_t> uniqueVertices;
 
              // For each face
-            for (auto face : shapes[0].mesh.indices) {
-                Vertex vertex;
-                glm::vec3 position, normal;
+            for (auto shape : shapes) {
+                for (auto face : shape.mesh.indices) {
+                    Vertex vertex;
+                    glm::vec3 position, normal;
 
-                // Get vertex position
-                position.x = attrib.vertices[face.vertex_index * 3];
-                position.y = attrib.vertices[face.vertex_index * 3 + 1];
-                position.z = attrib.vertices[face.vertex_index * 3 + 2];
-                // Get vertex normals
-                normal.x = attrib.normals[face.normal_index * 3];
-                normal.y = attrib.normals[face.normal_index * 3 + 1];
-                normal.z = attrib.normals[face.normal_index * 3 + 2];
-                // Set vertex
-                vertex.Position = position;
-                vertex.Normal = normal;
+                    // Get vertex position
+                    position.x = attrib.vertices[face.vertex_index * 3];
+                    position.y = attrib.vertices[face.vertex_index * 3 + 1];
+                    position.z = attrib.vertices[face.vertex_index * 3 + 2];
+                    // Get vertex normals
+                    normal.x = attrib.normals[face.normal_index * 3];
+                    normal.y = attrib.normals[face.normal_index * 3 + 1];
+                    normal.z = attrib.normals[face.normal_index * 3 + 2];
+                    // Set vertex
+                    vertex.Position = position;
+                    vertex.Normal = normal;
 
-                // Add the vertex to the vertices list if not already present
-                if (uniqueVertices.count(vertex) == 0) {
-                    // Set the index of the new vertex
-                    uniqueVertices[vertex] = static_cast<uint32_t> (vertices.size());
-                    vertices.push_back(vertex);
+                    // Add the vertex to the vertices list if not already present
+                    if (uniqueVertices.count(vertex) == 0) {
+                        // Set the index of the new vertex
+                        uniqueVertices[vertex] = static_cast<uint32_t> (vertices.size());
+                        vertices.push_back(vertex);
+                    }
+
+                    // Add the index to the indices list
+                    indices.push_back(uniqueVertices[vertex]);
                 }
-
-                // Add the index to the indices list
-                indices.push_back(uniqueVertices[vertex]);
             }
-            
-            // std::cout << vertices.size() << std::endl;
+
+            std::cout << vertices.size() << std::endl;
+            std::cout << indices.size() << std::endl;
             return Mesh(vertices, indices);
         }
 };

@@ -19,7 +19,7 @@ struct Vertex {
 
     // Overload the equality operator
     bool operator==(const Vertex& other) const {
-        return Position == other.Position;
+        return Position == other.Position && Normal == other.Normal;
     }
 };
 
@@ -27,7 +27,8 @@ struct Vertex {
 namespace std {
     template<> struct hash<Vertex> {
         size_t operator()(Vertex const& vertex) const noexcept {
-            return hash<glm::vec3>()(vertex.Position);
+            return hash<glm::vec3>()(vertex.Position) ^
+                   (hash<glm::vec3>()(vertex.Normal) << 1);
         }
     };
 }
@@ -49,7 +50,7 @@ class Mesh {
         }
 
         // Render the mesh
-        void Draw(Shader &shader) {
+        void Draw() {
             glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
             glBindVertexArray(0);

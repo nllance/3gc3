@@ -59,7 +59,7 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     // Wireframe mode
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Load models
     std::vector<std::string> paths;
@@ -88,7 +88,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw the mesh
-        src_model.meshes[0].Draw(shader);
+        src_model.meshes[0].Draw();
 
         // Swap the colour buffer during this render iteration and show to the screen
         glfwSwapBuffers(window);
@@ -142,7 +142,7 @@ void dump_framebuffer_to_ppm(std::string prefix, unsigned int width, unsigned in
     int totalPixelSize = pixelChannel * width * height * sizeof(GLubyte);
     GLubyte * pixels = new GLubyte [totalPixelSize];
     glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-    std::string file_name = "../images/cube_wire.ppm";
+    std::string file_name = "../images/cube_solid.ppm";
     std::ofstream fout(file_name);
     fout << "P3\n" << width << " " << height << "\n" << 255 << std::endl;
     for (size_t i = 0; i < height; i++)

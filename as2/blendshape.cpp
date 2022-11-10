@@ -58,7 +58,7 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     // Wireframe mode
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Load models
     std::vector<std::string> paths;
@@ -70,10 +70,10 @@ int main(void) {
     Model src_model(paths);
 
     // Load weights
-    std::vector<float> weights = get_weights("../data/weights/5.weights");
+    std::vector<float> weights = get_weights("../data/weights/11.weights");
 
     // Blendshape
-    std::vector<Vertex> new_vertices;
+    std::vector<Vertex>   new_vertices;
     std::vector<uint32_t> new_indices;
     // The way faces are constructed by vertices is the same across all shapes
     // So we can just use the indices of the base
@@ -95,9 +95,8 @@ int main(void) {
         for (j = 1; j < src_model.meshes.size(); j++) {
             // Vertices of the jth mesh
             std::vector<Vertex> add_vertices = src_model.meshes[j].vertices;
-            // 7.obj and 8.obj each has 1 less vertex than other meshes...
-            if (i >= add_vertices.size()) continue;
-            
+            // Check if vertex index is out of range
+            if (i >= add_vertices.size()) continue;  
             // Blending computation
             new_position.x += weights[j-1] * (add_vertices[i].Position.x - base_position.x);
             new_position.y += weights[j-1] * (add_vertices[i].Position.y - base_position.y);
@@ -134,7 +133,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw the mesh
-        new_mesh.Draw(shader);
+        new_mesh.Draw();
 
         // Swap the colour buffer during this render iteration and show to the screen
         glfwSwapBuffers(window);
@@ -188,7 +187,7 @@ void dump_framebuffer_to_ppm(std::string prefix, unsigned int width, unsigned in
     int totalPixelSize = pixelChannel * width * height * sizeof(GLubyte);
     GLubyte * pixels = new GLubyte [totalPixelSize];
     glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-    std::string file = "../images/blended2.ppm";
+    std::string file = "../images/blended11.ppm";
     std::ofstream fout(file);
     fout << "P3\n" << width << " " << height << "\n" << 255 << std::endl;
     for (size_t i = 0; i < height; i++)
