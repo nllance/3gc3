@@ -58,59 +58,22 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     // Wireframe mode
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // Load models
+    // Load model
     std::vector<std::string> paths;
     paths.push_back("../data/faces/base.obj");
     for (int i = 0; i < 35; i++) {
         std::string path = "../data/faces/" + std::to_string(i) + ".obj";
         paths.push_back(path);
     }
-    Model src_model(paths);
+    Model src(paths);
 
     // Load weights
-    std::vector<float> weights = get_weights("../data/weights/5.weights");
+    std::vector<float> weights = get_weights("../data/weights/2.weights");
 
-    // Blendshape
-    std::vector<Vertex> new_vertices;
-    std::vector<uint32_t> new_indices;
-    // The way faces are constructed by vertices is the same across all shapes
-    // So we can just use the indices of the base
-    new_indices = src_model.meshes[0].indices;
-    // Vertices of the base
-    std::vector<Vertex> base_vertices = src_model.meshes[0].vertices;
-
-    // Iterate through each vertex of the base
-    unsigned int i, j;
-    for (i = 0; i < base_vertices.size(); i++) {
-        Vertex new_vertex;
-        glm::vec3 base_position = base_vertices[i].Position;
-        // Initialize the new position to that of the base
-        glm::vec3 new_position = base_position;
-        // Use the normals of the base
-        new_vertex.Normal = base_vertices[i].Normal;
-
-        // Iterate through each mesh to get the corresponding vertex
-        for (j = 1; j < src_model.meshes.size(); j++) {
-            // Vertices of the jth mesh
-            std::vector<Vertex> add_vertices = src_model.meshes[j].vertices;
-            // 7.obj and 8.obj each has 1 less vertex than other meshes...
-            if (i >= add_vertices.size()) continue;
-            
-            // Blending computation
-            new_position.x += weights[j-1] * (add_vertices[i].Position.x - base_position.x);
-            new_position.y += weights[j-1] * (add_vertices[i].Position.y - base_position.y);
-            new_position.z += weights[j-1] * (add_vertices[i].Position.z - base_position.z);
-        }
-
-        // Set new position for the vertex
-        new_vertex.Position = new_position;
-        new_vertices.push_back(new_vertex);
-    }
-
-    // New Mesh to draw
-    Mesh new_mesh = Mesh(new_vertices, new_indices);
+    // Blended mesh
+    Mesh mesh = src.blendObjs(weights);
 
     // Transformation matrices
     glm::mat4 model = glm::mat4(1.0f);
@@ -134,7 +97,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw the mesh
-        new_mesh.Draw(shader);
+        mesh.Draw();
 
         // Swap the colour buffer during this render iteration and show to the screen
         glfwSwapBuffers(window);

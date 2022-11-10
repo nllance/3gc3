@@ -65,6 +65,7 @@ int main(void) {
     std::vector<std::string> paths;
     paths.push_back("../data/faces/20.obj");
     Model src_model(paths);
+    Mesh mesh = src_model.processObj(0);
 
     // Transformation matrices
     glm::mat4 model = glm::mat4(1.0f);
@@ -88,7 +89,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw the mesh
-        src_model.meshes[0].Draw(shader);
+        mesh.Draw();
 
         // Swap the colour buffer during this render iteration and show to the screen
         glfwSwapBuffers(window);
