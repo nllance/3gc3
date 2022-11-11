@@ -57,7 +57,7 @@ class Mesh {
         }
 
     private:
-        // // Vertex array object, Vertex buffer object and element buffer object
+        // Vertex array object, Vertex buffer object and element buffer object
         unsigned int VAO, VBO, EBO;
 
         // Initialize all the buffer objects/arrays

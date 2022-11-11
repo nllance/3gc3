@@ -70,7 +70,7 @@ int main(void) {
     Model src(paths);
 
     // Load weights
-    std::vector<float> weights = get_weights("../data/weights/2.weights");
+    std::vector<float> weights = get_weights("../data/weights/11.weights");
 
     // Blended mesh
     Mesh mesh = src.blendObjs(weights);
@@ -151,7 +151,7 @@ void dump_framebuffer_to_ppm(std::string prefix, unsigned int width, unsigned in
     int totalPixelSize = pixelChannel * width * height * sizeof(GLubyte);
     GLubyte * pixels = new GLubyte [totalPixelSize];
     glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-    std::string file = "../images/blended2.ppm";
+    std::string file = "../images/blended11.ppm";
     std::ofstream fout(file);
     fout << "P3\n" << width << " " << height << "\n" << 255 << std::endl;
     for (size_t i = 0; i < height; i++)
