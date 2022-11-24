@@ -1,8 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
 #include <iostream>
@@ -75,16 +73,16 @@ int main(void) {
 
     // Lighting
     shader.setFloat("light.constant", 1.0f);
-    shader.setFloat("light.linear", 0.007f);
-    shader.setFloat("light.quadratic", 0.0002f);
+    shader.setFloat("light.linear", 0.007f * pow(10, -4));
+    shader.setFloat("light.quadratic", 0.0002f * pow(10, -4));
     shader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
     shader.setVec3("light.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // Load model
     std::vector<std::string> objPaths;
     std::vector<std::string> texPaths;
-    objPaths.push_back("../data/bucket.obj");
-    texPaths.push_back("../data/bucket.jpg");
+    objPaths.push_back("../data/timmy.obj");
+    texPaths.push_back("../data/timmy.png");
     Model src(objPaths, texPaths);
 
     float theta = 0;
@@ -143,7 +141,7 @@ void dump_framebuffer_to_ppm(std::string prefix, unsigned int width, unsigned in
     int totalPixelSize = pixelChannel * width * height * sizeof(GLubyte);
     GLubyte * pixels = new GLubyte [totalPixelSize];
     glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-    std::string file = "../results/bucket_point.ppm";
+    std::string file = "../results/timmy_point2.ppm";
     std::ofstream fout(file);
     fout << "P3\n" << width << " " << height << "\n" << 255 << std::endl;
     for (size_t i = 0; i < height; i++)

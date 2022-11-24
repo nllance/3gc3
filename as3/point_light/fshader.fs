@@ -28,9 +28,8 @@ void main() {
     FragColor = vec4(result, 1.0);
 }
 
-// Calculates the color when using a point light
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos)
-{
+// Calculates the colour when using a point light
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos) {
     // Light direction
     vec3 lightDir = normalize(light.position - fragPos);
     // Attenuation

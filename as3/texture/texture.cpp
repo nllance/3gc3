@@ -1,8 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -73,6 +71,10 @@ int main(void) {
     std::vector<std::string> texPaths;
     objPaths.push_back("../data/timmy.obj");
     texPaths.push_back("../data/timmy.png");
+    objPaths.push_back("../data/bucket.obj");
+    texPaths.push_back("../data/bucket.jpg");
+    objPaths.push_back("../data/floor.obj");
+    texPaths.push_back("../data/floor.jpeg");
     Model src(objPaths, texPaths);
 
     // Rendering loop, keeps running until told to stop
