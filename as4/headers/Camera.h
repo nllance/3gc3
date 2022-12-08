@@ -8,7 +8,7 @@ class Camera {
 public:
     Camera(Vector3D eye, Vector3D target, Vector3D up, float fov, float aspect_ratio) {
         float theta =  fov * M_PI / 180.0;
-        float h = tan(theta/2);
+        float h = tan(theta / 2);
         m_ndc_height = 2.0 * h;
         m_ndc_width = aspect_ratio * m_ndc_height;
         
@@ -19,7 +19,7 @@ public:
     }
     
     Ray generate_ray(float col, float row) {
-        Vector3D direction = (col - 0.5)*m_ndc_width * m_u + (row-0.5) * m_ndc_height * m_v - m_w;
+        Vector3D direction = normalize((col - 0.5) * m_ndc_width * m_u + (row - 0.5) * m_ndc_height * m_v - m_w);
         return Ray(m_eye, direction);
     }
 

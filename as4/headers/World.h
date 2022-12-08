@@ -24,11 +24,19 @@ public:
 
 
 HitResult World::hit(Ray& ray, float min_t, float max_t) {
+    // Record the nearest hit
     HitResult hit_result;
-    
-    // TODO: 3. loop over each sphere in m_spheres
-    // call sphere->hit(...)
-    // hit_result should record the nearest hit
+
+    // Loop over each sphere in m_spheres
+    for (auto &sphere : m_spheres) {
+        HitResult new_hit = sphere->hit(ray, min_t, max_t);
+        // Update max_t to find the closest hit
+        if (new_hit.m_isHit) {
+            max_t = new_hit.m_t;
+            hit_result = new_hit;
+        }
+    }
+
     return hit_result;
 }
 
@@ -40,7 +48,7 @@ void World::generate_scene_one_diffuse() {
     
     // floor
     auto material_floor = make_shared<Diffuse>(Vector3D(0.5, 0.5, 0.5));
-    m_spheres.push_back(make_shared<Sphere>(Vector3D(0,-2000,0), 2000, material_floor));
+    m_spheres.push_back(make_shared<Sphere>(Vector3D(0, -2000,0), 2000, material_floor));
 }
 
 void World::generate_scene_one_specular() {
@@ -51,18 +59,16 @@ void World::generate_scene_one_specular() {
     
     // floor
     auto material_floor = make_shared<Diffuse>(Vector3D(0.5, 0.5, 0.5));
-    m_spheres.push_back(make_shared<Sphere>(Vector3D(0,-2000,0), 2000, material_floor));
+    m_spheres.push_back(make_shared<Sphere>(Vector3D(0, -2000,0), 2000, material_floor));
 }
 
 void World::generate_scene_multi_diffuse() {
     m_spheres.clear();
     
-    for (int row = -3; row < 3; ++row)
-    {
-        for (int col = -3; col < 3; ++col)
-        {
+    for (int row = -3; row < 3; ++row) {
+        for (int col = -3; col < 3; ++col) {
             float radius = random_float(0.2, 0.8);
-            Vector3D center(3*row + 0.5*random_float(), radius, 3*col + 0.5*random_float());
+            Vector3D center(3 * row + 0.5 * random_float(), radius, 3 * col + 0.5 * random_float());
             shared_ptr<Material> sphere_material;
             
             Vector3D color = Vector3D::random() * Vector3D::random();
@@ -73,18 +79,16 @@ void World::generate_scene_multi_diffuse() {
     
     // floor
     auto material_floor = make_shared<Diffuse>(Vector3D(0.5, 0.5, 0.5));
-    m_spheres.push_back(make_shared<Sphere>(Vector3D(0,-2000,0), 2000, material_floor));
+    m_spheres.push_back(make_shared<Sphere>(Vector3D(0, -2000,0), 2000, material_floor));
 }
 
 void World::generate_scene_multi_specular() {
     m_spheres.clear();
     
-    for (int row = -3; row < 3; ++row)
-    {
-        for (int col = -3; col < 3; ++col)
-        {
+    for (int row = -3; row < 3; ++row) {
+        for (int col = -3; col < 3; ++col) {
             float radius = random_float(0.2, 0.8);
-            Vector3D center(3*row + 0.5*random_float(), radius, 3*col + 0.5*random_float());
+            Vector3D center(3 * row + 0.5 * random_float(), radius, 3 * col + 0.5 * random_float());
             shared_ptr<Material> sphere_material;
             
             Vector3D color = Vector3D::random(0.3, 1);
@@ -95,24 +99,22 @@ void World::generate_scene_multi_specular() {
     
     // floor
     auto material_floor = make_shared<Diffuse>(Vector3D(0.5, 0.5, 0.5));
-    m_spheres.push_back(make_shared<Sphere>(Vector3D(0,-2000,0), 2000, material_floor));
+    m_spheres.push_back(make_shared<Sphere>(Vector3D(0, -2000,0), 2000, material_floor));
     
 }
 
 void World::generate_scene_all() {
     m_spheres.clear();
-    for (int row = -5; row < 10; ++row)
-    {
-        for (int col = -5; col < 5; ++col)
-        {
+    for (int row = -5; row < 10; ++row) {
+        for (int col = -5; col < 5; ++col) {
             float radius = random_float(0.2, 0.5);
-            Vector3D center(1.5*row + 0.5*random_float(), radius, 1.5*col + 0.5*random_float());
+            Vector3D center(1.5 * row + 0.5 * random_float(), radius, 1.5 * col + 0.5 * random_float());
             
             bool isDiffuse = random_float() <= 0.6;
             Vector3D color = isDiffuse ? Vector3D::random() * Vector3D::random() : Vector3D::random(0.5, 1);
             
             shared_ptr<Material> material;
-            if(isDiffuse)
+            if (isDiffuse)
                 material = make_shared<Diffuse>(color);
             else
                 material = make_shared<Specular>(color);
@@ -122,7 +124,7 @@ void World::generate_scene_all() {
     
     // floor
     auto material_floor = make_shared<Diffuse>(Vector3D(0.5, 0.5, 0.5));
-    m_spheres.push_back(make_shared<Sphere>(Vector3D(0,-2000,0), 2000, material_floor));
+    m_spheres.push_back(make_shared<Sphere>(Vector3D(0, -2000,0), 2000, material_floor));
 }
 
 

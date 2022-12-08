@@ -14,11 +14,11 @@ float random_float(/*[0,1)*/) {
 }
 
 float random_float(float min, float max) {
-    return min + (max-min)*random_float();
+    return min + (max - min) * random_float();
 }
 
 int random_int(int min, int max) {
-    return static_cast<int>(random_float(min, max+1));
+    return static_cast<int>(random_float(min, max + 1));
 }
 
 class Vector3D {
@@ -74,7 +74,7 @@ public:
     }
 
     float length_squared() const {
-        return m_x*m_x + m_y*m_y + m_z*m_z;
+        return m_x * m_x + m_y * m_y + m_z * m_z;
     }
 
     static Vector3D random() {
@@ -82,7 +82,7 @@ public:
     }
 
     static Vector3D random(float min, float max) {
-        return Vector3D(random_float(min,max), random_float(min,max), random_float(min,max));
+        return Vector3D(random_float(min, max), random_float(min, max), random_float(min, max));
     }
     
 public:
@@ -104,7 +104,7 @@ Vector3D operator*(const Vector3D &u, const Vector3D &v) {
 }
 
 Vector3D operator*(float t, const Vector3D &v) {
-    return Vector3D(t*v.m_x, t*v.m_y, t*v.m_z);
+    return Vector3D(t * v.m_x, t * v.m_y, t * v.m_z);
 }
 
 Vector3D operator*(const Vector3D &v, float t) {
@@ -112,7 +112,7 @@ Vector3D operator*(const Vector3D &v, float t) {
 }
 
 Vector3D operator/(Vector3D v, float t) {
-    return (1/t) * v;
+    return (1 / t) * v;
 }
 
 float dot(const Vector3D &u, const Vector3D &v) {

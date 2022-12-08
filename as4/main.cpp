@@ -20,7 +20,7 @@ void write_color_to_file(std::ostream &out, Vector3D pixel_color, int samples_pe
 
 Vector3D ray_hit_color(Ray& r, World& world, int max_light_bounce_num) {
     if (max_light_bounce_num <= 0)
-        return Vector3D(0,0,0);
+        return Vector3D(0, 0, 0);
     
     HitResult hit = world.hit(r, 0.001, std::numeric_limits<float>::infinity());
     if (hit.m_isHit) {
@@ -39,33 +39,33 @@ int main()
     int rays_per_pixel = 100;
     const int max_light_bounce_num = 5;
     
-    Vector3D eye(20,3,3);
-    Vector3D target(0,0,0);
-    Vector3D up(0,1,0);
-    float fov = 20; //degree
+    Vector3D eye(20, 3, 3);
+    Vector3D target(0, 0, 0);
+    Vector3D up(0, 1, 0);
+    float fov = 20; // degree
     Camera camera(eye, target, up, fov, aspect_ratio);
     
     World world;
     
-    //TODO: 6. uncomment one by one and render the following worlds
-    world.generate_scene_one_diffuse();
-    //world.generate_scene_one_specular();
-    //world.generate_scene_multi_diffuse();
-    //world.generate_scene_multi_specular();
-    //world.generate_scene_all();
+    // Render the following worlds
+    // world.generate_scene_one_diffuse();
+    // world.generate_scene_one_specular();
+    // world.generate_scene_multi_diffuse();
+    // world.generate_scene_multi_specular();
+    world.generate_scene_all();
    
     // Set path for the output image
-    std::string result_ppm_path = "../results/result.ppm";
+    std::string result_ppm_path = "../results/all.ppm";
     
     std::ofstream fout (result_ppm_path);
     fout << "P3\n" << width << ' ' << height << "\n255\n";
-    for (int j = height-1; j >= 0; --j) {
+    for (int j = height - 1; j >= 0; --j) {
         std::cout << "casting row " << j << std::endl;
         for (int i = 0; i < width; ++i) {
-            Vector3D pixel_color(0,0,0);
+            Vector3D pixel_color(0, 0, 0);
             for (int s = 0; s < rays_per_pixel; ++s) {
-                float col = (i + random_float()) / (width-1);
-                float row = (j + random_float()) / (height-1);
+                float col = (i + random_float()) / (width - 1);
+                float row = (j + random_float()) / (height - 1);
                 Ray r = camera.generate_ray(col, row);
                 pixel_color += ray_hit_color(r, world, max_light_bounce_num);
             }
